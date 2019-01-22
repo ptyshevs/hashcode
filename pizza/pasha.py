@@ -1,10 +1,12 @@
 import sys
 
+
 class D2Box:
     def __init__(self, box):
         self.box = box
         self.nrow = len(box)
         self.ncol = len(box[0])
+
 
 class Figure:
     def __init__(self, nrow, ncol):
@@ -14,13 +16,15 @@ class Figure:
     def __repr__(self):
         return '\n'.join(['*' * self.ncol for i in range(self.nrow)])
 
-def is_good_place(map : D2Box, i, j, figure : Figure, L):
+
+def is_good_place(map: D2Box, i, j, figure: Figure, L):
     """
     figure is assumed to have area in range [2L, H]
     """
     cnt_tomato, cnt_mushroom = 0, 0
 
-    if i + figure.nrow > map.nrow or j + figure.ncol > map.ncol:
+    if i + figure.nrow > map.nrow or j + figure.ncol > map.ncol or\
+            i < 0 or j < 0:
         return False
 
     # iterating by figure
@@ -33,11 +37,15 @@ def is_good_place(map : D2Box, i, j, figure : Figure, L):
                 cnt_mushroom += 1
             elif coord == 'X':  # This place is occupied by another figure
                 return False
-    return cnt_tomato >= L and cnt_mushroom >= L
+    if cnt_tomato >= L and cnt_mushroom >= L:
+        return (cnt_mushroom - cnt_tomato, figure.nrow * figure.ncol)
+    else:
+        return False
 
 
 def divisors(n):
     return {x for x in range(2, (n + 1) // 2 + 1) if n % x == 0 and n != x}
+
 
 def gen_figures(L, H):
     min_area = 2 * L
