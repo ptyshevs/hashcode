@@ -1,42 +1,47 @@
 from pasha import gen_figures, is_good_place, D2Box
 from helpers import output, parse, disp
-# from helpers import parse, disp
 
 
-def put_figure(i, j, figure, pizza):
-    for k in range(i, i + figure.nrow):
-        for m in range(j, j + figure.ncol):
+def put_figure(x, y, figure, pizza):
+    for k in range(x, x + figure.nrow):
+        for m in range(y, y + figure.ncol):
             pizza[k][m] = 'X'
-    return i, j, i + figure.nrow - 1, j + figure.ncol - 1
+    return x, y, x + figure.nrow - 1, y + figure.ncol - 1
+
+
+def convolution(inp, filt, neighbours_sum, x, y):
+    rows, cols, min_ing, max_area, pizza = inp
+    if pizza[x][y] == 'X':
+        continue
+    f_rows, f_cols = len(filt), len(filt[0])
+    s = 0
+
+    for x_offs in range((f_rows - 1) // 2, (f_rows - 1) // 2 + 1):
+        for y_offs in range((f_cols - 1) // 2, (f_cols - 1) // 2 + 1):
+            x_shif = x + x_offs
+            y_shif = y + y_offs
+            v = filt[x_offs][y_offs]
+            if x_shif < 0 or y_shif < 0 or x_shif >= rows or\
+                    y_shif >= cols or pizza[x_shif][y_shif] == 'X':
+                continue
+            s += v if pizza[x_shif][y_shif] == 'M' else -v
+
+    if abs(s) in neighbours_sum:
+        neighbours_sum[abs(s)].append((x, y, s))
+    else:
+        neighbours_sum[abs(s)] = [(x, y, s)]
 
 
 def convolve(inp, filt):
     rows, cols, min_ing, max_area, pizza = inp
-    # Square
     assert len(filt) == len(filt[0])
-    # Odd
     assert len(filt) % 2
 
-    f_rows, f_cols = len(filt), len(filt[0])
     neighbours_sum = {}
-    for i in range(rows):
-        for j in range(cols):
-            if pizza[i][j] == 'X':
-                continue
-            s = 0
-            for f_i in range(f_rows):
-                for f_j in range(f_cols):
-                    x = i + (f_i - (f_rows - 1) // 2)
-                    y = j + (f_j - (f_cols - 1) // 2)
-                    v = filt[f_i][f_j]
-                    item = pizza[f_i][f_j]
-                    if x < 0 or y < 0 or x >= rows or y >= cols or item == 'X':
-                        continue
-                    s += v if item == 'M' else -v
-            if abs(s) in neighbours_sum:
-                neighbours_sum[abs(s)].append((i, j, s))
-            else:
-                neighbours_sum[abs(s)] = [(i, j, s)]
+
+    for x in range(rows):
+        for y in range(cols):
+            convolution(inp, filt, neighbours_sum, x, y)
     return neighbours_sum
 
 
@@ -64,14 +69,7 @@ def cut(inp):
         key = max(neighbours_sum.keys())
         prev_key = key
         for item in neighbours_sum[key]:
-            # print()
-            # print()
-            # disp(pizza)
             x, y, v = item
-            # print()
-            # print()
-            # print(x, y, v)
-            # print()
             best = None
             item = pizza[x][y]
             if item == 'X':
@@ -82,9 +80,6 @@ def cut(inp):
                         o_x, o_y = x + offset_x, y + offset_y
                         score = is_good_place(potato, o_x, o_y, figure, min_ing)
                         ind = 0 if key > 10 else 1
-                        # print(o_x, o_y, score)
-                        # print(figure)
-                        # print()
                         if score is False:
                             continue
                         elif best is None:
@@ -95,16 +90,14 @@ def cut(inp):
                             best = o_x, o_y, figure, score[ind]
             if best is not None:
                 slices.append(put_figure(*best[:3], pizza))
-            # disp(pizza)
     return slices
 
 
 def main():
-    input_fs = [#"input/a_example.in",
-    # "input/b_small.in",]
-    "input/c_medium.in",
-    "input/d_big.in"]
-    # input_fs = ["input/b_small.in",]
+    input_fs = ["input/a_example.in",
+                "input/b_small.in",
+                "input/c_medium.in",
+                "input/d_big.in"]
     for input_f in input_fs:
         output_f = input_f.replace(".in", ".out").replace("input", "output")
         inp = parse(input_f)
@@ -112,7 +105,7 @@ def main():
         slices = cut(inp)
         # print(slices)
         output(output_f, slices)
-        print('.')
+        print('.', end='')
 
 
 if __name__ == "__main__":
