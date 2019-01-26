@@ -121,8 +121,10 @@ if __name__ == '__main__':
         total_score = 0
         input_dirname = "input"
         output_dirname = "output"
-        input_fnames = [_.strip('.in') for _ in os.listdir(input_dirname)]
-        output_fnames = [_.strip('.out') for _ in os.listdir(output_dirname)]
+        input_fnames = [_[:-3] for _ in os.listdir(input_dirname)]
+        output_fnames = [_[:-4] for _ in os.listdir(output_dirname)]
+        # print("input names:", input_fnames)
+        # print("output names:", output_fnames)
         for fname in input_fnames:
             if fname in output_fnames:
                 s = score(f'{input_dirname}/{fname}.in', f'{output_dirname}/{fname}.out')
