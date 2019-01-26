@@ -1,7 +1,6 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 import sys
-import numpy as np
+import os
+
 class Endpoint(object):
     def __init__(self, Ld,K):
         self.Ld = int(Ld)
@@ -118,6 +117,18 @@ def score(inputF, submissionF):
 if __name__ == '__main__':
     if len(sys.argv) == 3:
         print("Score:", score(sys.argv[1], sys.argv[2]))
+    else:
+        total_score = 0
+        input_dirname = "input"
+        output_dirname = "output"
+        input_fnames = [_.strip('.in') for _ in os.listdir(input_dirname)]
+        output_fnames = [_.strip('.out') for _ in os.listdir(output_dirname)]
+        for fname in input_fnames:
+            if fname in output_fnames:
+                s = score(f'{input_dirname}/{fname}.in', f'{output_dirname}/{fname}.out')
+                print(f"{fname}.in: {s}")
+                total_score += s
+        print("Total score:", total_score)
 
 
 
