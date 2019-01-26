@@ -31,12 +31,16 @@ def solve(inp):
     sorted_by_profit = sorted(cs_vid_pairs, key=cs_vid_pairs.get, reverse=True)
     # print("sorted by profit:", sorted_by_profit)
     cs_by_vid = [CacheServer(_, cap_ser) for _ in range(n_ser)]  # list of lists
+    vid_by_used = dict()
     for (v_id, cs_id) in sorted_by_profit:
         cs = cs_by_vid[cs_id]
         v_size = vid_sizes[v_id]
-        if cs.capacity_used + v_size < cs.capacity:
+        if v_id not in vid_by_used:
+            vid_by_used[v_id] = 0
+        if vid_by_used[v_id] < 3 and cs.capacity_used + v_size < cs.capacity:
             cs.capacity_used += v_size
             cs.videos_id.append(v_id)
+        vid_by_used[v_id] += 1
     return cs_by_vid
 
 
@@ -53,8 +57,6 @@ def main():
         cs_by_vid = solve(inp)
         output(output_f, cs_by_vid)
         # break
-        print('.', end='')
-
 
 if __name__ == "__main__":
     main()

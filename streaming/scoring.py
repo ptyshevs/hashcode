@@ -80,12 +80,17 @@ def score(inputF, submissionF):
         if len(set(cacheSsummary)) != len(cacheSsummary):
             print(f"There are repetitions in videos stored on server {Cs.id}: {cacheSsummary}")
             return 0
-        allocated_memory = sum([videos[_] for _ in map(int, cacheSsummary)])
-        if allocated_memory > X:
-            print(f"Cache capacity for server {Cs.id} exceeded: {allocated_memory} > {X}")
-            return 0
-        for y in cacheSsummary:
-            Cs.addVideo(int(y))
+        if len(cacheSsummary) > 0:
+            try:
+                allocated_memory = sum([videos[_] for _ in map(int, cacheSsummary)])
+            except ValueError:
+                print("cacheSsummary:", cacheSsummary)
+                break
+            if allocated_memory > X:
+                print(f"Cache capacity for server {Cs.id} exceeded: {allocated_memory} > {X}")
+                return 0
+            for y in cacheSsummary:
+                Cs.addVideo(int(y))
         cacheServers.append(Cs)
         line = line + 1
     num = 0
