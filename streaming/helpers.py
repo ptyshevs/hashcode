@@ -27,10 +27,9 @@ def parse(input_f):
     return n_vid, n_endp, n_req, n_ser, cap_ser, vid_sizes, endps, reqs
 
 
-def output(output_f, caches):
+def output(output_f, cs_by_vid):
     with open(output_f, "w") as f:
-        f.write(str(len(caches)))
-        f.write('\n')
-        for i, s in enumerate(caches):
-            f.write(' '.join(map(str, [i] + s)))
-            f.write('\n')
+        print(len(cs_by_vid), file=f)
+        for i in range(len(cs_by_vid)):
+            cs = cs_by_vid[i]
+            print(f"{str(i)} {' '.join([str(_) for _ in cs.videos_id])}", file=f)
