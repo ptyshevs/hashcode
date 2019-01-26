@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
 import numpy as np
 class Endpoint(object):
     def __init__(self, Ld,K):
@@ -47,6 +48,9 @@ def score(inputF, submissionF):
     C = int(firstLine[3])
     X = int(firstLine[4])
     S = content[1].split(" ")
+    videos = {k: int(S[k]) for k in range(len(S))}
+
+
     line = 2
     endPoints = []
     for endpoint in range(0, E):
@@ -74,6 +78,13 @@ def score(inputF, submissionF):
         cacheSsummary = content[line].split(" ")
         Cs = CacheServer(int(cacheSsummary[0]))
         cacheSsummary = cacheSsummary[1:]
+        if len(set(cacheSsummary)) != len(cacheSsummary):
+            print(f"There are repetitions in videos stored on server {Cs.id}: {cacheSsummary}")
+            return 0
+        allocated_memory = sum([videos[_] for _ in map(int, cacheSsummary)])
+        if allocated_memory > X:
+            print(f"Cache capacity for server {Cs.id} exceeded: {allocated_memory} > {X}")
+            return 0
         for y in cacheSsummary:
             Cs.addVideo(int(y))
         cacheServers.append(Cs)
@@ -104,10 +115,9 @@ def score(inputF, submissionF):
     total = int(1000 * num / den)
     return total
 
-listResults =[]
-listResults.append(score("input_example", "submission_example"))
-print("Score: ",sum(listResults))
-
+if __name__ == '__main__':
+    if len(sys.argv) == 3:
+        print("Score:", score(sys.argv[1], sys.argv[2]))
 
 
 
