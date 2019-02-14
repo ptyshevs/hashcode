@@ -5,6 +5,7 @@ class Server:
         self.size = size
         self.row = -1
         self.slot = -1
+        self.pool = -1
     
     def __repr__(self):
-        return "S[{}]: size={}, capacity={}, row={}, slot={}".format(self.id, self.size, self.capacity, self.row, self.slot)
+        return "S[{}]: size={}, capacity={}, row={}, slot={} | P[{}]".format(self.id, self.size, self.capacity, self.row, self.slot, self.pool)
