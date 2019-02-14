@@ -1,5 +1,5 @@
 class Server:
-    def __init__(self, id, capacity, size):
+    def __init__(self, id, size, capacity):
         self.id = id
         self.capacity = capacity
         self.size = size
