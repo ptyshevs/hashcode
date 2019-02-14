@@ -128,8 +128,14 @@ if __name__ == '__main__':
         # example_output(servers)
         # for serv in servers:
         #     print(serv)
-        result = multiprocess_solve(servers, len(servers), P, R, 1000)
-        best_of_the_best = max(result, key=lambda x:x[1])
-        print("Best of the best score:", best_of_the_best[1])
+        best_of_the_best_of_the_best = [[], 0]
+        for reinit in range(3):
+            result = multiprocess_solve(servers, len(servers), P, R, 1000)
+            best_of_the_best = max(result, key=lambda x:x[1])
+            if best_of_the_best[1] > best_of_the_best_of_the_best[1]:
+                best_of_the_best_of_the_best[0] = [_.copy() for _ in best_of_the_best[0]]
+                best_of_the_best_of_the_best[1] = best_of_the_best[1]
+            print("Best of the best score for iteration {}: {}".format(reinit, best_of_the_best[1]))
+        print("Best of the best of the best score:", best_of_the_best_of_the_best[1])
         # for serv in servers:
         #     print(serv)
