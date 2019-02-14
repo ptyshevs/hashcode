@@ -3,7 +3,6 @@ from helpers import parse
 def magic(path='input/example.in'):
     R, S, U, P, M, unavaiable, servers = parse(path)
     servers = sorted(servers, key=lambda x: x[1] / x[0], reverse=True)
-    print(servers)
 
     rows = []
     for i in range(R):
@@ -24,8 +23,6 @@ def magic(path='input/example.in'):
         del servers[0]
     # for i in range(R):
         # print(rows[i])
-    print("RESULT")
-    print(result)
     return result
 
 magic()

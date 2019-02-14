@@ -2,6 +2,9 @@ from helpers import parse
 from Server import Server
 from pruner import magic
 import numpy as np
+import multiprocessing
+import os
+import scipy
 
 def is_allocated(serv):
     return serv.row != -1 and serv.slot != -1
@@ -70,6 +73,17 @@ def solve(servers, M, P, R, n_iter=100):
             accept_prob =  np.exp(-0.01 * cnt)
             cnt += 1
         print("{}: {} - changed {} | best score: {} | accept_prob: {}".format(i, score, changed, best_score, accept_prob))
+    return servers, best_score
+
+def work(servers, M, P, R, n_iter):
+    scipy.random.seed()
+    return solve(servers, M, P, R, n_iter)
+
+def multiprocess_solve(servers, M, P, R, n_iter=100):
+    pool = multiprocessing.Pool(os.cpu_count())
+    tasks = [([serv.copy() for serv in servers], M, P, R, n_iter) for _ in range(os.cpu_count())]
+    results = pool.starmap(work, tasks)
+    return results
 
 def input_wrapper(inp):
     servers = []
@@ -107,13 +121,15 @@ if __name__ == '__main__':
         print("U:", U)
         print("P:", P)
         print("M:", M)
-        print("uavaiable:", unavaiable)
-        print("servers:", servers)
+        # print("uavaiable:", unavaiable)
+        # print("servers:", servers)
         # servers = [Server(i, _[0], _[1]) for i, _ in enumerate(servers)]
         servers = input_wrapper(magic(path))
         # example_output(servers)
         # for serv in servers:
         #     print(serv)
-        solve(servers, len(servers), P, R, 1000)
+        result = multiprocess_solve(servers, len(servers), P, R, 1000)
+        best_of_the_best = max(result, key=lambda x:x[1])
+        print("Best of the best score:", best_of_the_best[1])
         # for serv in servers:
         #     print(serv)
