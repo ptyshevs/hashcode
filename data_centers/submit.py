@@ -1,11 +1,12 @@
 from helpers import parse
 import argparse
 import sys
+from tqdm import trange, tqdm
 
 
 def score(R, pools):
     min_cap = 1e17
-    for row in range(R):
+    for row in trange(R, desc="Calculating the score", leave=False):
         for pool in pools:
             capacity = 0
             for server, r in pool:
@@ -23,7 +24,7 @@ def evaluate(args):
     rows = [[False for _ in range(S)] for _ in range(R)]
     pools = [[] for _ in range(P)]
     with open(args.filename, "r") as f:
-        for i in range(M):
+        for i in trange(M, desc="Parsing the file", leave=False):
             line = f.readline().split()
             if line[0] == 'x' and len(line) == 1:
                 continue
