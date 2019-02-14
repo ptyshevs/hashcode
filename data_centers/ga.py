@@ -1,5 +1,6 @@
 from helpers import parse
 from Server import Server
+from pruner import magic
 import numpy as np
 
 def is_allocated(serv):
@@ -34,8 +35,52 @@ def my_score(candidate, M, P, R):
     # print(pool_gcs)
     return min(pool_gcs)
 
-def mutate(candidate, M, P):
-    pass
+def mutate(M, P):
+    n_tries = np.random.randint(0, 20)
+
+    idxs = np.random.randint(0, M, size=n_tries)
+    pools = np.random.randint(0, P, size=n_tries)
+    return idxs, pools
+
+def solve_step(candidate, M, P, R, accept_prob=0.5, prev_score=0):
+    idxs, pools = mutate(len(candidate), P)
+    # print("chose:", candidate[serv_idx])
+    prev_pools = [candidate[serv_idx].pool for serv_idx in idxs]
+    for i, serv_idx in enumerate(idxs):
+        candidate[serv_idx].pool = pools[i]
+    candidate_score = my_score(candidate, M, P, R)
+    if candidate_score > prev_score:
+        if np.random.random() < accept_prob:
+            return candidate_score, True
+        else:
+            for i, serv_idx in enumerate(idxs):
+                candidate[serv_idx].pool = prev_pools[i]
+            return prev_score, False
+    else:
+        return prev_score, False
+
+def solve(servers, M, P, R, n_iter=100):
+    accept_prob = 0.9
+    best_score = 0
+    cnt = 1
+    for i in range(n_iter):
+        score, changed = solve_step(servers, M, P, R, accept_prob, best_score)
+        if score > best_score:
+            best_score = score
+            accept_prob =  np.exp(-0.01 * cnt)
+            cnt += 1
+        print("{}: {} - changed {} | best score: {} | accept_prob: {}".format(i, score, changed, best_score, accept_prob))
+
+def input_wrapper(inp):
+    servers = []
+    for i, v in enumerate(inp):
+        r, slot = v[0][0], v[0][1]
+        s, cap = v[1][0], v[1][1]
+        serv = Server(i, s, cap)
+        serv.row = r
+        serv.slot = slot
+        servers.append(serv)
+    return servers
 
 def example_output(servers):
     servers[0].row = 0
@@ -55,7 +100,8 @@ def example_output(servers):
     servers[3].pool = 1
 
 if __name__ == '__main__':
-        R, S, U, P, M, unavaiable, servers = parse('input/example.in')
+        path = 'input/dc.in'
+        R, S, U, P, M, unavaiable, servers = parse(path)
         print("R:", R)
         print("S:", S)
         print("U:", U)
@@ -63,7 +109,11 @@ if __name__ == '__main__':
         print("M:", M)
         print("uavaiable:", unavaiable)
         print("servers:", servers)
-        servers = [Server(i, _[0], _[1]) for i, _ in enumerate(servers)]
-        example_output(servers)
-        for serv in servers:
-            print(serv)
+        # servers = [Server(i, _[0], _[1]) for i, _ in enumerate(servers)]
+        servers = input_wrapper(magic(path))
+        # example_output(servers)
+        # for serv in servers:
+        #     print(serv)
+        solve(servers, len(servers), P, R, 1000)
+        # for serv in servers:
+        #     print(serv)

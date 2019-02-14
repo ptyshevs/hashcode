@@ -2,7 +2,7 @@ import sys
 
 
 def parse(filename="input/dc.in"):
-    """Parses the input
+    """ Parses the input
 
     :filename: path to the input file
     :returns:
@@ -21,7 +21,6 @@ def parse(filename="input/dc.in"):
             and ci (1 ≤ z , 000) , denoting the size i ≤ S 1 ≤ c i ≤ 1 of the
             server (zi), ie. the number of slots that it occupies, and the
             capacity (ci) of the machine.
-
     """
     try:
         with open(filename, "r") as f:

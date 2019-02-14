@@ -1,9 +1,8 @@
 from helpers import parse
 
-print(parse())
-def magic():
-    R, S, U, P, M, unavaiable, servers = parse()
-    servers = sorted(servers, key=lambda x: x[1], reverse=True)
+def magic(path='input/example.in'):
+    R, S, U, P, M, unavaiable, servers = parse(path)
+    servers = sorted(servers, key=lambda x: x[1] / x[0], reverse=True)
     print(servers)
 
     rows = []
@@ -23,8 +22,10 @@ def magic():
                 result.append([[i, slot],servers[0]])
                 break
         del servers[0]
-    for i in range(R):
-        print(rows[i])
+    # for i in range(R):
+        # print(rows[i])
+    print("RESULT")
     print(result)
+    return result
 
 magic()
