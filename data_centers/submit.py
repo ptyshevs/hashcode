@@ -19,7 +19,8 @@ def score(R, pools):
 
 
 def evaluate(args):
-    f_inp = args.input if args.input else "input/example.in"
+    f_inp = args.input if args.input else "input/dc.in"
+    print("FILE:", f_inp)
     R, S, U, P, M, unavaiable, servers = parse(f_inp)
     rows = [[False for _ in range(S)] for _ in range(R)]
     pools = [[] for _ in range(P)]
@@ -31,11 +32,16 @@ def evaluate(args):
 
             server = servers[i]
             a_r, a_s, a_p = list(map(int, line))
-            if a_r < 0 or a_r >= R or\
-                    a_s < 0 or a_s + server[0] - 1 >= S or\
-                    a_p < 0 or a_p >= P:
-                raise RuntimeError("Wrong position at line {}".format(i))
-
+            print("R:", R)
+            if a_r < 0 or a_r >= R:
+                print("ROW PROBLEM")
+                raise RuntimeError("Wrong position at line {}: pool {}, row {}, slot {}".format(i, a_p, a_r, a_s))
+            elif a_s < 0 or a_s + server[0] - 1 >= S:
+                print("SLOT PROB")
+                raise RuntimeError("Wrong position at line {}: pool {}, row {}, slot {}".format(i, a_p, a_r, a_s))
+            elif a_p < 0 or a_p >= P:
+                print("POOL")
+                raise RuntimeError("Wrong position at line {}: pool {}, row {}, slot {}".format(i, a_p, a_r, a_s))
             for j in range(server[0]):
                 if rows[a_r][a_s + j]:
                     raise RuntimeError("Server overlaps with another "

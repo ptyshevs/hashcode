@@ -4,8 +4,8 @@ def magic(path='input/example.in'):
     R, S, U, P, M, unavaiable, servers = parse(path)
     for i in range(len(servers)):
         servers[i].append(i)
-    servers = sorted(servers, key=lambda x: x[1] / x[0], reverse=True)
-    print(servers)
+    servers = sorted(servers, key=lambda x: x[0], reverse=True)
+#     print(servers)
 
     rows = []
 
@@ -26,8 +26,8 @@ def magic(path='input/example.in'):
             rows[i] = rows[i][:slot] + servers[0][0]*'u' + rows[i][slot + servers[0][0]:]
             result.append([[i, slot],servers[0]])
         del servers[0]
-    for i in range(R):
-        print(rows[i])
+#     for i in range(R):
+#         print(rows[i])
     return result
 
 magic()
