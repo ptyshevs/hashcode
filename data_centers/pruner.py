@@ -13,14 +13,16 @@ def magic(path='input/example.in'):
 
     result = []
     #    done = 0
+    cnt = 0
     while len(servers) > 0:
         for i in range(R):
             if servers[0][0]*'a' in rows[i]:
                 slot = rows[i].find(servers[0][0]*'a')
                 rows[i] = rows[i][:slot] + servers[0][0]*'u' + rows[i][slot + servers[0][0]:]
-                result.append([[i, slot],servers[0]])
+                result.append([[i, slot, cnt],servers[0]])
                 break
         del servers[0]
+        cnt += 1
     # for i in range(R):
         # print(rows[i])
     return result
