@@ -4,7 +4,7 @@ from operator import attrgetter
 class Slide:
     def __init__(self, photo1, photo2=0):
         if photo2 != 0:
-            self.ids = [photo1.id,  photo2]
+            self.ids = [photo1.id,  photo2.id]
             self.tags = photo1.tags & photo2.tags
         else:
             self.ids = [photo1.id]
@@ -19,9 +19,10 @@ def get_slides():
         x1_containers = [x for x in all_posibilities if x[0].ids[0] == x1.id]
         if len(x1_containers) > 0:
             slides.append(min(x1_containers, key=lambda x: x[1])[0])
-            all_posibilities = [x for x in all_posibilities if x[0].ids[0] != x1.id]
+            all_posibilities = [x for x in all_posibilities if x[0].ids[0] != x1.id and x[0].ids[1] != x1.id]
     for x1 in photos:
-        slides.append(x1)
+        if x1.type == 'H':
+            slides.append(x1)
     return slides
 
 get_slides()
