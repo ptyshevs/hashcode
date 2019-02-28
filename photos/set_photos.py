@@ -20,7 +20,7 @@ def get_slides(path):
         if len(x1_containers) > 0:
             a = max(x1_containers, key=lambda x: x[1])[0]
             slides.append(a)
-            all_posibilities = [x for x in all_posibilities if x[0].ids[0] not in a.ids and x[0].ids[1] not in a.ids]
+        all_posibilities = [x for x in all_posibilities if x[0].ids[0] not in a.ids and x[0].ids[1] not in a.ids]
     for x1 in photos:
         if x1.type == 'H':
             slides.append(x1)
