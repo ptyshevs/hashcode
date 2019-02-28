@@ -61,10 +61,10 @@ def concat_slides(slides: list):
                 if score > best_score:
                     best_score = score
                     best_ind = i
-                if best_score > 10 or i > 1000:
+                if best_score > 100 or i > 2000:
                     break
             slideshow.append(slides.pop(best_ind))
-            pbar.update(2)
+            pbar.update(1)
     return slideshow
 
 

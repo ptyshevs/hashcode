@@ -50,7 +50,7 @@ def crossover(mom, dad):
     # child2[select_mask] = mom[select_mask]
     return np.copy(dad), np.copy(mom)
 
-def evolve(population, slideshow, retain_frac=0.8, retain_random=0.05, mutate_chance=0.05):
+def evolve(population, slideshow, retain_frac=1, retain_random=0.05, mutate_chance=0.1):
     """
     Evolution step
     :param population: list or candidate solutions
@@ -97,7 +97,7 @@ def work(slideshow, N, pop_size=10, n_generations=100):
 
 def multiprocess_solve(slideshow, N, pop_size=100, n_iter=100):
     pool = multiprocessing.Pool(os.cpu_count())
-    tasks = [([serv.copy() for serv in slideshow], N, pop_size, n_iter) for _ in range(os.cpu_count())]
+    tasks = [(slideshow[:], N, pop_size, n_iter) for _ in range(os.cpu_count())]
     results = pool.starmap(work, tasks)
     return results
 
@@ -131,5 +131,13 @@ if __name__ == '__main__':
     # Add pairs of vertical photos to all slides
     slides.extend(vert_slides)
 
-    res = multiprocess_solve(slides, len(slides), 10, 100)
-
+    res = multiprocess_solve(slides, len(slides), 10, 1000)
+    best_res, best_score = None, 0
+    for r in res:
+        score = fitness(r, slides)
+        if score > best_score:
+            best_res = r
+            best_score = score
+    print("Best score:", best_score)
+    new_slideshow = [slides[i] for i in best_res]
+    submit(new_slideshow, path[:-3] + "out")

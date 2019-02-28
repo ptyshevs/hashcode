@@ -24,7 +24,7 @@ def get_slides(path):
         all_posibilities = [x for x in all_posibilities if x[0].ids[0] not in a.ids and x[0].ids[1] not in a.ids]
     for x1 in photos:
         if x1.type == 'H':
-            slides.append(x1)
+            slides.append(Slide(x1))
     return slides
 
 if __name__ == '__main__':
