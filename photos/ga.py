@@ -5,6 +5,8 @@ import multiprocessing
 import os
 import scipy
 from submit import submit
+from set_photos import get_slides
+from main import divide, concat_verts
 
 def fitness(ids, slideshow):
     score = 0
@@ -42,10 +44,11 @@ def mutate(candidate, mutate_frac=0.1):
 
 def crossover(mom, dad):
     select_mask = np.random.binomial(1, 0.5, size=len(mom)).astype('bool')
-    child1, child2 = np.copy(mom), np.copy(dad)
-    child1[select_mask] = dad[select_mask]
-    child2[select_mask] = mom[select_mask]
-    return child1, child2
+    # child1, child2 = np.copy(mom), np.copy(dad)
+
+    # child1[select_mask] = dad[select_mask]
+    # child2[select_mask] = mom[select_mask]
+    return np.copy(dad), np.copy(mom)
 
 def evolve(population, slideshow, retain_frac=0.8, retain_random=0.05, mutate_chance=0.05):
     """
@@ -65,7 +68,6 @@ def evolve(population, slideshow, retain_frac=0.8, retain_random=0.05, mutate_ch
     for gene in next_population[1:]:
         if np.random.random() < mutate_chance:
             mutate(gene)
-
     places_left = len(population) - len(next_population)
     children = []
     parent_max_idx = len(next_population) - 1
@@ -81,7 +83,6 @@ def evolve(population, slideshow, retain_frac=0.8, retain_random=0.05, mutate_ch
 
 def solve(slideshow, N, population_size=10, n_generations=100):
     population = initialize_population(population_size, N)
-    print(population)
     for generation in range(n_generations):
         population = evolve(population, slideshow)
         if generation == 0:
@@ -90,25 +91,45 @@ def solve(slideshow, N, population_size=10, n_generations=100):
             print("Generation ", generation, ": ", fitness(population[0], slideshow))
     return population[0]
 
-def work(servers, M, P, R, n_iter):
+def work(slideshow, N, pop_size=10, n_generations=100):
     scipy.random.seed()
-    return solve(servers, M, P, R, n_iter)
+    return solve(slideshow, N, pop_size, n_generations)
 
-def multiprocess_solve(servers, M, P, R, n_iter=100):
+def multiprocess_solve(slideshow, N, pop_size=100, n_iter=100):
     pool = multiprocessing.Pool(os.cpu_count())
-    tasks = [([serv.copy() for serv in servers], M, P, R, n_iter) for _ in range(os.cpu_count())]
+    tasks = [([serv.copy() for serv in slideshow], N, pop_size, n_iter) for _ in range(os.cpu_count())]
     results = pool.starmap(work, tasks)
     return results
 
 
 def solve_all():
     for fname in ["data/a_example.txt",
-                  "data/b_lovely_land"]
+                  "data/b_lovely_land.txt",
+                  "data/c_memorable_moments.txt",
+                  "data/d_pet_pictures.txt",
+                  "data/e_shiny/selfies.txt"]:
+        photos = get_photos(fname)
+        slideshow = slide_transform(simple_slideshow(photos))
+        res = solve(slideshow, len(slideshow), 10, 30)
+        new_slideshow = [slideshow[i] for i in res]
+        submit(new_slideshow, fname[:-3] + 'out') 
+
+def parse_submit(path):
+    with open(path) as f:
+        N = int(f.readline())
 
 if __name__ == '__main__':
-    path = 'data/d_pet_pictures.txt'
+    path = 'data/c_memorable_moments.txt'
     photos = get_photos(path)
-    slideshow = slide_transform(simple_slideshow(photos))
-    res = solve(slideshow, len(slideshow), 10, 30)
-    new_slideshow = [slideshow[i] for i in res]
-    submit(new_slideshow, path[:-3] + 'out')
+
+    # Create array of horizontal photos and vertical ones
+    verts, slides = divide(photos)
+
+    # Create good pairs of vertical photos
+    vert_slides = concat_verts(verts)
+
+    # Add pairs of vertical photos to all slides
+    slides.extend(vert_slides)
+
+    res = multiprocess_solve(slides, len(slides), 10, 100)
+
