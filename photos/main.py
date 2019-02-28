@@ -1,4 +1,5 @@
 from parser import *
+from submit import submit
 
 
 if __name__ == '__main__':
@@ -11,7 +12,7 @@ if __name__ == '__main__':
             for other_pic in photos[i + 1:]:
                 if other_pic.type == 'V':
                     slideshow.append([pic, other_pic])
-    
+
     for i in slideshow:
         print(i)
     submit(slideshow)
