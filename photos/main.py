@@ -31,8 +31,9 @@ def concat_verts(verts: list):
                 if len(tags.intersection(p.tags)) > deleted:
                     deleted = len(tags.intersection(p.tags))
                     best_ind = i
-                if deleted < 2:
+                if deleted < 5 or i > 1000:
                     break
+            best_ind = 0
             slide.append(verts.pop(best_ind))
             slides.append(Slide(slide))
             pbar.update(2)
@@ -60,7 +61,7 @@ def concat_slides(slides: list):
                 if score > best_score:
                     best_score = score
                     best_ind = i
-                if best_score > 3:
+                if best_score > 10 or i > 1000:
                     break
             slideshow.append(slides.pop(best_ind))
             pbar.update(2)
@@ -70,7 +71,7 @@ def concat_slides(slides: list):
 def main():
     name = sys.argv[1]
     inp = "data/" + name
-    out = "out/" + name
+    out = "dummyout/" + name
     photos = get_photos(inp)
     print(name)
 
@@ -78,6 +79,7 @@ def main():
     verts, slides = divide(photos)
 
     # Create good pairs of vertical photos
+    verts = sorted(verts, key=lambda s: len(s.tags), reverse=True)
     vert_slides = concat_verts(verts)
 
     # Add pairs of vertical photos to all slides
@@ -85,13 +87,12 @@ def main():
 
     # Sort slides
     slides = sorted(slides, key=lambda s: len(s.tags), reverse=True)
-    print(len(slides[0].tags))
 
     # Concatenate photos
-    # slideshow = concat_slides(slides)
+    slideshow = concat_slides(slides)
 
     # Submit
-    submit(slides, out)
+    submit(slideshow, out)
 
 
 if __name__ == '__main__':
