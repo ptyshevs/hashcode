@@ -4,7 +4,8 @@ class Photo:
         self.type = type
         self.tags = tags
         self.tags[-1] = self.tags[-1][:-1]
-    
+        self.tags = set(self.tags)
+
     def __repr__(self):
         return f"{self.id} [{self.type}]: {self.tags}"
 
