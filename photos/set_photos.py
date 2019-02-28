@@ -11,8 +11,8 @@ class Slide:
             self.tags = photo1.tags
         self.tags_len = len(self.tags)
 
-def get_slides():
-    photos = parser.get_photos()
+def get_slides(path):
+    photos = parser.get_photos(path)
     slides = []
     all_posibilities = [[Slide(x1, x2), len(x1.tags & x2.tags)] for x1 in photos for x2 in photos if x1.type == 'V' and x2.type == 'V' and x1 != x2]
     for x1 in photos:
@@ -24,5 +24,3 @@ def get_slides():
         if x1.type == 'H':
             slides.append(x1)
     return slides
-
-get_slides()
