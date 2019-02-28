@@ -18,7 +18,7 @@ def get_slides():
     for x1 in photos:
         x1_containers = [x for x in all_posibilities if x[0].ids[0] == x1.id]
         if len(x1_containers) > 0:
-            slides.append(min(x1_containers, key=lambda x: x[1])[0])
+            slides.append(max(x1_containers, key=lambda x: x[1])[0])
             all_posibilities = [x for x in all_posibilities if x[0].ids[0] != x1.id and x[0].ids[1] != x1.id]
     for x1 in photos:
         if x1.type == 'H':
