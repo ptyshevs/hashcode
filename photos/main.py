@@ -36,18 +36,25 @@ def concat_verts(verts: list):
     return slides
 
 
+def score_of_pair(cur, next):
+    tags_common = cur.intersection(next)
+    tags_cur = cur - next
+    tags_next = next - cur
+    score += min((len(tags_common), len(tags_cur), len(tags_next)))
+    return score
+
+
 def concat_slides(slides: list):
     slideshow = [slides.pop()]
     with trange(len(slides)) as pbar:
-        score = 0
+        best_score = 0
         best_ind = 0
+        # TODO count not score but lost tags
         for i, p in enumerate(slides):
-            if len(tags.intersection(p.tags)) > deleted:
-        while len(slides):
-            slide = [verts.pop()]
-            tags = slide[0].tags
-                    deleted = len(tags.intersection(p.tags))
-                    best_ind = i
+            if score(slideshow[-1], p) > best_score:
+                best_score = score(slideshow[-1], p)
+                best_ind = i
+        slideshow.append(slides.pop(best_ind))
             slide.append(verts.pop(best_ind))
             slides.append(slide)
             pbar.update(2)
