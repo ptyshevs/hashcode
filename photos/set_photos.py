@@ -25,4 +25,3 @@ def get_slides():
             slides.append(x1)
     return slides
 
-get_slides()

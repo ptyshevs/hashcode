@@ -1,6 +1,7 @@
-from parser import Photo, get_photos
+from parser import Photo, get_photos, Slide
 from submit import submit
 from tqdm import trange
+import sys
 
 
 def divide(photos):
@@ -13,14 +14,14 @@ def divide(photos):
         if p.type == 'V':
             verts.append(p)
         else:
-            slides.append(p)
+            slides.append(Slide(p))
     return verts, slides
 
 
 def concat_verts(verts: list):
     assert not len(verts) % 2
     slides = []
-    with trange(len(verts)) as pbar:
+    with trange(len(verts), leave=True, desc="concat_verts") as pbar:
         while len(verts):
             slide = [verts.pop()]
             tags = slide[0].tags
@@ -30,39 +31,48 @@ def concat_verts(verts: list):
                 if len(tags.intersection(p.tags)) > deleted:
                     deleted = len(tags.intersection(p.tags))
                     best_ind = i
+                if deleted < 2:
+                    break
             slide.append(verts.pop(best_ind))
-            slides.append(slide)
+            slides.append(Slide(slide))
             pbar.update(2)
     return slides
 
 
 def score_of_pair(cur, next):
-    tags_common = cur.intersection(next)
-    tags_cur = cur - next
-    tags_next = next - cur
-    score += min((len(tags_common), len(tags_cur), len(tags_next)))
+    scur, snext = cur.tags, next.tags
+    tags_common = scur.intersection(snext)
+    tags_scur = scur - snext
+    tags_snext = snext - scur
+    score = min((len(tags_common), len(tags_scur), len(tags_snext)))
     return score
 
 
 def concat_slides(slides: list):
     slideshow = [slides.pop()]
-    with trange(len(slides)) as pbar:
-        best_score = 0
-        best_ind = 0
-        # TODO count not score but lost tags
-        for i, p in enumerate(slides):
-            if score(slideshow[-1], p) > best_score:
-                best_score = score(slideshow[-1], p)
-                best_ind = i
-        slideshow.append(slides.pop(best_ind))
-            slide.append(verts.pop(best_ind))
-            slides.append(slide)
+    with trange(len(slides), leave=True, desc="concat slides") as pbar:
+        while (len(slides)):
+            best_score = 0
+            best_ind = 0
+            # TODO count not score but lost tags
+            for i, p in enumerate(slides):
+                score = score_of_pair(slideshow[-1], p)
+                if score > best_score:
+                    best_score = score
+                    best_ind = i
+                if best_score > 3:
+                    break
+            slideshow.append(slides.pop(best_ind))
             pbar.update(2)
-    return slides
+    return slideshow
 
 
 def main():
-    photos = get_photos("data/e_shiny_selfies.txt")
+    name = sys.argv[1]
+    inp = "data/" + name
+    out = "out/" + name
+    photos = get_photos(inp)
+    print(name)
 
     # Create array of horizontal photos and vertical ones
     verts, slides = divide(photos)
@@ -73,13 +83,15 @@ def main():
     # Add pairs of vertical photos to all slides
     slides.extend(vert_slides)
 
-    slideshow = []
+    # Sort slides
+    slides = sorted(slides, key=lambda s: len(s.tags), reverse=True)
+    print(len(slides[0].tags))
 
-    # Fill slideshow
-    # solve()
+    # Concatenate photos
+    # slideshow = concat_slides(slides)
 
     # Submit
-    # submit(slideshow)
+    submit(slides, out)
 
 
 if __name__ == '__main__':
