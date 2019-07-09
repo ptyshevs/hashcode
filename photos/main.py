@@ -71,7 +71,7 @@ def concat_slides(slides: list):
 def main():
     name = sys.argv[1]
     inp = "data/" + name
-    out = "dummyout/" + name
+    out = name
     photos = get_photos(inp)
     print(name)
 

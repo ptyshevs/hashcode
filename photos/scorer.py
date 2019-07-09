@@ -1,3 +1,6 @@
+import sys
+import os
+
 def get_slide_tags(photos, slide):
     tags = set()
     for photo_idx in slide:
@@ -37,3 +40,14 @@ def score(input_file, output_file):
         p1_tags = p2_tags
 
     return total_score
+
+if __name__ == '__main__':
+    total = 0
+    for filename in ["a_example.txt", "b_lovely_landscapes.txt",
+                     "c_memorable_moments.txt", "d_pet_pictures.txt",
+                     "e_shiny_selfies.txt"]:
+        os.system(f"python3 main.py {filename}")
+        s = score("data/" + filename, filename)
+        print(f"{filename:.10s}: {s}")
+        total += s
+    print(f"Total={total}")
